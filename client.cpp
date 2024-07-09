@@ -1,18 +1,11 @@
-#include<iostream>
-#include<string.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-#include<unistd.h>
+#include <iostream>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include "util.h"
 
-void errif(bool condition, const char *errmsg)
-{
-	if(condition){
-		perror(errmsg);
-		exit(EXIT_FAILURE);
-	}
-}
+#define BUFFER_SIZE 1024
 
 int main()
 {
@@ -24,14 +17,13 @@ int main()
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	serv_addr.sin_port = htons(8888);
+
 	errif(connect(sock, (sockaddr*)&serv_addr, sizeof(serv_addr))==-1, "socket connect error");
 
-	std::cout << "connect successful" << std::endl;
 	std::cout << "server ip:" << inet_ntoa(serv_addr.sin_addr) << " port:" << ntohs(serv_addr.sin_port) << std::endl;
 
-	while(true)
-	{
-		char buf[1024];
+	while(true){
+		char buf[BUFFER_SIZE];
 		bzero(&buf, sizeof(buf));
 		std::cin >> buf;
 		ssize_t write_bytes = write(sock, buf, sizeof(buf));
@@ -47,10 +39,10 @@ int main()
 			std::cout << "server socket disconnected" << std::endl;
 			break;
 		}else if(read_bytes == -1){
-			close(sock);
 			errif(true, "socket read error");
+			close(sock);
 		}
 	}
-	
+	close(sock);
 	return 0;
 }
