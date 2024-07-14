@@ -8,6 +8,7 @@
 #include "Epoll.h"
 #include "InetAddress.h"
 #include "Socket.h"
+#include "Channel.h"
 
 #define MAX_EVENTS 1024
 #define READ_BUFFER 1024
@@ -26,21 +27,24 @@ int main()
 	serv_sock->listen();
 	Epoll *ep = new Epoll();
 	serv_sock->setnonblocking();
-	ep->addFd(serv_sock->getFd(), EPOLLIN|EPOLLET);
+	Channel *servChannel = new Channel(ep, serv_sock->getFd());
+	servChannel->enableReading();
 	while(true){
-		std::vector<epoll_event> events = ep->poll();
-		int nfds = events.size();
+		std::vector<Channel*> activeChannel = ep->poll();
+		int nfds = activeChannel.size();
 		for(int i=0; i<nfds; i++){
-			if(events[i].data.fd == serv_sock->getFd()){
+			int chfd = activeChannel[i]->getFd();
+			if(chfd == serv_sock->getFd()){
 				InetAddress *clnt_addr = new InetAddress();
 				Socket *clnt_sock = new Socket(serv_sock->accept(clnt_addr));
 				std::cout << "new client fd:" << clnt_sock->getFd();
 				std::cout << " IP:" << inet_ntoa(clnt_addr->addr.sin_addr);
 				std::cout << " Port:" << ntohs(clnt_addr->addr.sin_port) << std::endl;
 				clnt_sock->setnonblocking();
-				ep->addFd(clnt_sock->getFd(), EPOLLIN|EPOLLET);
-			}else if(events[i].events & EPOLLIN){
-				handleReadEvent(events[i].data.fd);
+				Channel *clntChannel = new Channel(ep, clnt_sock->getFd());
+				clntChannel->enableReading();
+			}else if(activeChannel[i]->getRevents() & EPOLLIN){
+				handleReadEvent(activeChannel[i]->getFd());
 			}else{
 				std::cout << "something else happened" << std::endl;
 			}
