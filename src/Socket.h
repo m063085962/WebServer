@@ -8,7 +8,7 @@ private:
 
 public:
 	Socket();
-	Socket(int);
+	Socket(int _fd);
 	~Socket();
 
 	void bind(InetAddress*);
