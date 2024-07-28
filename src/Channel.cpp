@@ -15,6 +15,7 @@ Channel::~Channel()
 
 void Channel::handleEvent()
 {
+	// loop->addThread(callback);
 	callback();
 }
 
