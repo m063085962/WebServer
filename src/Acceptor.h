@@ -1,6 +1,5 @@
 #pragma once
 #include <functional>
-#include <cstdio>
 
 class EventLoop;
 class Socket;
