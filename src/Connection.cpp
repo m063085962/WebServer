@@ -38,17 +38,17 @@ void Connection::echo(int sockfd)
 		ssize_t bytes_read = read(sockfd, buf, sizeof(buf));
 		if(bytes_read > 0){
 			readBuffer->append(buf, bytes_read);
-		} else if(bytes_read=-1 && errno==EINTR){
+		} else if(bytes_read==-1 && errno==EINTR){
 			printf("continue reading");
 			continue;
 		} else if(bytes_read==-1 && ((errno==EAGAIN)||(errno==EWOULDBLOCK))){
 			printf("finish reading once\n");
 			printf("message from client fd %d: %s\n", sockfd, readBuffer->c_str());
-			// errif(write(sockfd, readBuffer->c_str(), readBuffer->size())==-1, "socket write error");
+			//errif(write(sockfd, readBuffer->c_str(), readBuffer->size())==-1, "socket write error");
 			send(sockfd);
 			readBuffer->clear();
 			break;
-		} else if(bytes_read==0){
+		} else if(bytes_read == 0){
 			printf("EOF, client fd %d disconnected\n", sockfd);
 			deleteConnectionCallback(sockfd);
 			break;
