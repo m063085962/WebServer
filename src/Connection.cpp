@@ -7,14 +7,13 @@
 #include <string.h>
 #include <iostream>
 
-Connection::Connection(EventLoop *_loop, Socket *_sock) : loop(_loop), sock(_sock), channel(nullptr)
-{
+Connection::Connection(EventLoop *_loop, Socket *_sock) 
+	: loop(_loop), sock(_sock), channel(nullptr), readBuffer(nullptr){
 	channel = new Channel(loop, sock->getFd());
 	channel->enableRead();
 	channel->useET();
 	std::function<void()> cb = std::bind(&Connection::echo, this, sock->getFd());
 	channel->setReadCallback(cb);
-	channel->setUseThreadPool(true);
 	readBuffer = new Buffer();
 }
 
