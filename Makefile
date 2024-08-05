@@ -5,10 +5,12 @@ server:
 	server.cpp \
 	-o server \
 	&& \
-	g++ src/util.cpp src/Buffer.cpp src/Socket.cpp src/InetAddress.cpp client.cpp -g -o client
+	g++ src/Connection.cpp src/EventLoop.cpp src/Epoll.cpp src/Channel.cpp src/Socket.cpp \
+	src/Buffer.cpp src/util.cpp client.cpp -g \
+	-o client
 
 test:
-	g++ src/util.cpp src/Buffer.cpp src/Socket.cpp src/InetAddress.cpp src/ThreadPool.cpp \
+	g++ src/util.cpp src/Buffer.cpp src/Socket.cpp src/ThreadPool.cpp \
 	-pthread \
 	test.cpp -o test
 	

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <functional>
 
 class Epoll;
@@ -6,13 +7,13 @@ class Channel;
 class EventLoop
 {
 private:
-	Epoll *ep;
-	bool quit;
+	Epoll *epoll_{nullptr};
+	bool quit_{false};
 public:
 	EventLoop();
 	~EventLoop();
 
-	void loop();
-	void updateChannel(Channel*);
+	void Loop();
+	void UpdateChannel(Channel *ch);
 };
 

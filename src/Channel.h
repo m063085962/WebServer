@@ -1,4 +1,5 @@
 #pragma once
+
 #include <functional>
 
 class Socket;
@@ -6,28 +7,29 @@ class EventLoop;
 class Channel
 {
 private:
-	EventLoop *loop;
-	int fd;
-	uint32_t events;
-	uint32_t ready;
-	bool inEpoll;
-	std::function<void()> readCallback;
-	std::function<void()> writeCallback;
+	EventLoop *loop_;
+	int fd_;
+	uint32_t listen_events_;
+	uint32_t ready_events_;
+	bool in_epoll_;
+	std::function<void()> read_callback_;
+	std::function<void()> write_callback_;
+
 public:
-	Channel(EventLoop *_loop, int _fd);
+	Channel(EventLoop *loop, int fd);
 	~Channel();
 	
-	void handleEvent();
-	void enableRead();
+	void HandleEvent();
+	void EnableRead();
 
-	int getFd();
-	uint32_t getEvents();
-	uint32_t getReady();
-	bool getInEpoll();
-	void setInEpoll(bool _in = true);
-	void useET();
+	int GetFd();
+	uint32_t GetListenEvents();
+	uint32_t GetReadyEvents();
+	bool GetInEpoll();
+	void SetInEpoll(bool in = true);
+	void UseET();
 
-	void setReady(uint32_t);
-	void setReadCallback(std::function<void()>);
+	void SetReadyEvents(uint32_t ev);
+	void SetReadCallback(std::function<void()> const &callback);
 };
 

@@ -1,6 +1,4 @@
-#ifndef UTIL_H
-#define UTIL_H
+#pragma once
 
-void errif(bool, const char*);
+void ErrorIf(bool condition, const char *msg);
 
-#endif
