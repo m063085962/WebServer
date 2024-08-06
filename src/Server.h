@@ -18,6 +18,8 @@ private:
 	std::vector<EventLoop*> sub_reactors_;
 	ThreadPool *thread_pool_;
 	std::function<void(Connection *)> on_connect_callback_;
+	std::function<void(Connection *)> on_message_callback_;
+	std::function<void(Connection *)> new_connect_callback_;
 
 public:
 	explicit Server(EventLoop *loop);
@@ -26,5 +28,7 @@ public:
 	void NewConnection(Socket *sock);
 	void DeleteConnection(Socket *sock);
 	void OnConnect(std::function<void(Connection *)> fn);
+	void OnMessage(std::function<void(Connection *)> fn);
+	void NewConnect(std::function<void(Connection *)> fn);
 };
 

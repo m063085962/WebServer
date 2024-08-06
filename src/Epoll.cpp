@@ -5,6 +5,7 @@
 #include <sys/epoll.h>
 
 #include "Channel.h"
+#include "Socket.h"
 #include "util.h"
 
 #define MAX_EVENTS 1000
@@ -41,13 +42,13 @@ std::vector<Channel*> Epoll::Poll(int timeout)
 
 void Epoll::UpdateChannel(Channel *ch)
 {
-	int fd = ch->GetFd();
+	int fd = ch->GetSocket()->GetFd();
 	struct epoll_event ev{};
 	ev.data.ptr = ch;
 	ev.events = ch->GetListenEvents();
-	if(!ch->GetInEpoll()){
+	if(!ch->GetExist()){
 		ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &ev)==-1, "epoll add error");
-		ch->SetInEpoll();
+		ch->SetExist();
 	} else{
 		ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &ev)==-1, "epoll modify error");
 	}
@@ -55,8 +56,8 @@ void Epoll::UpdateChannel(Channel *ch)
 
 void Epoll::DeleteChannel(Channel *ch)
 {
-	int fd = ch->GetFd();
+	int fd = ch->GetSocket()->GetFd();
 	ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr)==-1, "epoll delete error");
-	ch->SetInEpoll(false);
+	ch->SetExist(false);
 }
 

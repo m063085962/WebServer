@@ -12,7 +12,7 @@ Acceptor::Acceptor(EventLoop *loop) : loop_(loop), sock_(nullptr), channel_(null
 	sock_->Bind(addr);
 	// sock_->setnonblocking();
 	sock_->Listen();
-	channel_ = new Channel(loop_, sock_->GetFd());
+	channel_ = new Channel(loop_, sock_);
 	std::function<void()> cb = std::bind(&Acceptor::AcceptConnection, this);
 	channel_->SetReadCallback(cb);
 	channel_->EnableRead();

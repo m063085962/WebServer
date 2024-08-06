@@ -8,7 +8,11 @@
 
 EventLoop::EventLoop() {epoll_ = new Epoll();}
 
-EventLoop::~EventLoop() {delete epoll_;}
+EventLoop::~EventLoop() 
+{
+	Quit();
+	delete epoll_;
+}
 
 void EventLoop::Loop()
 {
@@ -21,5 +25,8 @@ void EventLoop::Loop()
 	}
 }
 
+void EventLoop::Quit() {quit_ = true;}
+
 void EventLoop::UpdateChannel(Channel *ch) {epoll_->UpdateChannel(ch);}
+void EventLoop::DeleteChannel(Channel *ch) {epoll_->DeleteChannel(ch);}
 
