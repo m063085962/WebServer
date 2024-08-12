@@ -1,24 +1,23 @@
 #pragma once
 #include <vector>
+#include "common.h"
 
-#ifdef OS_LINUX
 #include <sys/epoll.h>
-#endif
 
 class Channel;
 class Epoll
 {
-private:
-	int epfd_{-1};
-	struct epoll_event *events_{nullptr};
-
 public:
 	Epoll();
 	~Epoll();
 
-	void UpdateChannel(Channel *ch);
-	void DeleteChannel(Channel *ch);
+	RC UpdateChannel(Channel *ch);
+	RC DeleteChannel(Channel *ch);
 
 	std::vector<Channel *> Poll(int timeout = -1);
+
+private:
+	int epfd_;
+	struct epoll_event *events_{nullptr};
 };
 

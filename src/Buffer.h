@@ -1,18 +1,22 @@
 #pragma once
+#include <memory>
 #include <string>
+#include "common.h"
 
 class Buffer
 {
-private:
-	std::string buf_;
 public:
 	Buffer() = default;
 	~Buffer() = default;
+	
+	const std::string &buf() const;
+	const char* c_str() const;
+	void set_buf(const char *buf);
 
 	void Append(const char* _str, int _size);
-	ssize_t Size();
-	const char *ToStr();
+	ssize_t Size() const;
 	void Clear();
-	void Getline();
-	void SetBuf(const char *buf);
+
+private:
+	std::string buf_;
 };

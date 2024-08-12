@@ -1,13 +1,17 @@
 #pragma once
+
 #include <functional>
+#include <memory>
+#include <utility>
+
 #include <vector>
 #include <queue>
+
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <future>
-#include <memory>
-#include <utility>
+#include "common.h"
 
 class ThreadPool
 {
@@ -16,19 +20,20 @@ private:
 	std::queue<std::function<void()>> tasks_;
 	std::mutex queue_mutex_;
 	std::condition_variable condition_variable_;
-	bool stop_{false};
+	std::atomic<bool> stop_{false};
+
 public:
 	explicit ThreadPool(unsigned int size = std::thread::hardware_concurrency());
 	~ThreadPool();
 
 	template<class F, class... Args>
-	auto Add(F &&f, Args  &&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
+	auto Add(F &&f, Args  &&...args) -> std::future<typename std::invoke_result<F, Args...>::type>;
 };
 
 template<class F, class... Args>
-auto ThreadPool::Add(F &&f, Args &&... args) -> std::future<typename std::result_of<F(Args...)>::type>
+auto ThreadPool::Add(F &&f, Args &&... args) -> std::future<typename std::invoke_result<F, Args...>::type>
 {
-	using return_type = typename std::result_of<F(Args...)>::type;
+	using return_type = typename std::invoke_result<F, Args...>::type;
 	auto task = std::make_shared<std::packaged_task<return_type()>>(
 			std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 	std::future<return_type> res = task->get_future();

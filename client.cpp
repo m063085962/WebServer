@@ -1,27 +1,29 @@
 #include <iostream>
-
-#include "src/Connection.h"
-#include "src/Socket.h"
+#include "src/pine.h"
 
 int main()
 {
 	Socket *sock = new Socket();
+	sock->Create();
 	sock->Connect("127.0.0.1", 8888);
 
-	Connection *conn = new Connection(nullptr, sock);
+	Connection *conn = new Connection(sock->fd(), nullptr);
 
 	while(true){
-		conn->GetlineSendBuffer();
+		std::string input;
+		std::getline(std::cin, input);
+		conn->SetSendBuffer(input.c_str());
 		conn->Write();
 		if(conn->GetState() == Connection::State::Closed){
 			conn->Close();
 			break;
 		}
 		conn->Read();
-		std::cout << "Message from server:" << conn->ReadBuffer() << std::endl;
+		std::cout << "Message from server:" << conn->GetReadBuffer()->c_str() << std::endl;
 	}
 
 	delete conn;
+	delete sock;
 	return 0;
 }
 

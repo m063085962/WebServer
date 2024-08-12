@@ -6,27 +6,20 @@
 #include "Channel.h"
 
 
-EventLoop::EventLoop() {epoll_ = new Epoll();}
+EventLoop::EventLoop() {epoll_ = std::make_unique<Epoll>();}
 
-EventLoop::~EventLoop() 
-{
-	Quit();
-	delete epoll_;
-}
+EventLoop::~EventLoop() {}
 
-void EventLoop::Loop()
+void EventLoop::Loop() const
 {
-	while(!quit_){
-		std::vector<Channel *> chs;
-		chs = epoll_->Poll();
-		for(auto &ch : chs){
-			ch->HandleEvent();
+	while(true){
+		for(Channel *active_ch : epoll_->Poll()){
+			active_ch->HandleEvent();
 		}
 	}
 }
 
-void EventLoop::Quit() {quit_ = true;}
+void EventLoop::UpdateChannel(Channel *ch) const {epoll_->UpdateChannel(ch);}
 
-void EventLoop::UpdateChannel(Channel *ch) {epoll_->UpdateChannel(ch);}
-void EventLoop::DeleteChannel(Channel *ch) {epoll_->DeleteChannel(ch);}
+void EventLoop::DeleteChannel(Channel *ch) const {epoll_->DeleteChannel(ch);}
 

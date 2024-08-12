@@ -2,18 +2,17 @@
 
 #include <unistd.h>
 #include <cstring>
-#include <sys/epoll.h>
+#include <cassert>
 
 #include "Channel.h"
 #include "Socket.h"
-#include "util.h"
 
 #define MAX_EVENTS 1000
 
 Epoll::Epoll()
 {
 	epfd_ = epoll_create1(0);
-	ErrorIf(epfd_==-1, "epoll create error");
+	assert(epfd_ != -1);
 	events_ = new epoll_event[MAX_EVENTS];
 	memset(events_, 0, sizeof(*events_)*MAX_EVENTS);
 }
@@ -22,42 +21,69 @@ Epoll::~Epoll()
 {
 	if(epfd_ != -1){
 		close(epfd_);
-		epfd_ = -1;
 	}
-	delete [] events_;
+	delete[] events_;
 }
 
 std::vector<Channel*> Epoll::Poll(int timeout)
 {
 	std::vector<Channel *> active_channels;
 	int nfds = epoll_wait(epfd_, events_, MAX_EVENTS, timeout);
-	ErrorIf(nfds==-1, "epoll wait error");
+	if(nfds==-1) perror(" epoll wait error");
 	for(int i=0; i<nfds; i++){
 		Channel *ch = (Channel *)events_[i].data.ptr;
-		ch->SetReadyEvents(events_[i].events);  //return event status
+		int events = events_[i].events;
+		if(events & EPOLLIN){
+			ch->SetReadyEvents(Channel::READ_EVENT);
+		}
+		if(events & EPOLLOUT){
+			ch->SetReadyEvents(Channel::WRITE_EVENT);
+		}
+		if(events & EPOLLET){
+			ch->SetReadyEvents(Channel::ET);
+		}
 		active_channels.push_back(ch);
 	}
 	return active_channels;
 }
 
-void Epoll::UpdateChannel(Channel *ch)
+RC Epoll::UpdateChannel(Channel *ch)
 {
-	int fd = ch->GetSocket()->GetFd();
+	int sockfd = ch->fd();
 	struct epoll_event ev{};
 	ev.data.ptr = ch;
-	ev.events = ch->GetListenEvents();
-	if(!ch->GetExist()){
-		ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &ev)==-1, "epoll add error");
-		ch->SetExist();
-	} else{
-		ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &ev)==-1, "epoll modify error");
+	if(ch->GetListenEvents() & Channel::READ_EVENT) {
+		ev.events |= EPOLLIN | EPOLLPRI;
 	}
+	if(ch->GetListenEvents() & Channel::WRITE_EVENT) {
+		ev.events |= EPOLLOUT;
+	}
+	if(ch->GetListenEvents() & Channel::ET) {
+		ev.events |= EPOLLET;
+	}
+	if(!ch->GetExist()) {
+		if(epoll_ctl(epfd_, EPOLL_CTL_ADD, sockfd, &ev) == -1){
+			perror("epoll add error");
+			return RC_EPOLL_ERROR;
+		}
+		ch->SetExist();
+	} else {
+		if(epoll_ctl(epfd_, EPOLL_CTL_MOD, sockfd, &ev) == -1){
+			perror("epoll mod error");
+			return RC_EPOLL_ERROR;
+		}
+	}
+	return RC_SUCCESS;
 }
 
-void Epoll::DeleteChannel(Channel *ch)
+RC Epoll::DeleteChannel(Channel *ch)
 {
-	int fd = ch->GetSocket()->GetFd();
-	ErrorIf(epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr)==-1, "epoll delete error");
+	int sockfd = ch->fd();
+	if(epoll_ctl(epfd_, EPOLL_CTL_DEL, sockfd, nullptr) == -1){
+		perror("epoll delete error");
+		return RC_EPOLL_ERROR;
+	}
 	ch->SetExist(false);
+	return RC_SUCCESS;
 }
 

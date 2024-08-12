@@ -1,12 +1,13 @@
 src = $(wildcard src/*.cpp)
 server:
-	g++ -std=c++11 -pthread -g \
+	g++ -std=c++17 -pthread -g \
 	$(src) \
 	server.cpp \
 	-o server \
 	&& \
-	g++ src/Connection.cpp src/EventLoop.cpp src/Epoll.cpp src/Channel.cpp src/Socket.cpp \
-	src/Buffer.cpp src/util.cpp client.cpp -g \
+	g++ -std=c++17 -g \
+	src/Connection.cpp src/EventLoop.cpp src/Channel.cpp src/Socket.cpp src/Epoll.cpp src/Buffer.cpp \
+	client.cpp \
 	-o client
 
 test:

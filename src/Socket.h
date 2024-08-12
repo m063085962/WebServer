@@ -1,41 +1,27 @@
 #pragma once
-#include <arpa/inet.h>
-
-class InetAddress
-{
-public:
-	InetAddress();
-	InetAddress(const char *ip, uint16_t port);
-	~InetAddress() = default;
-
-	void SetAddr(sockaddr_in addr);
-	sockaddr_in GetAddr();
-	const char *GetIp();
-	uint16_t GetPort();
-
-private:
-	struct sockaddr_in addr_{};
-};
+#include <string>
+#include "common.h"
 
 class Socket
 {
-private:
-	int fd_{-1};
-
 public:
 	Socket();
-	explicit Socket(int fd);
 	~Socket();
 
-	void Bind(InetAddress *addr);
-	void Listen();
-	int Accept(InetAddress *addr);
-	
-	void Connect(InetAddress *addr);
-	void Connect(const char *ip, uint16_t port);
+	void set_fd(int fd);
+	int fd() const;
 
-	void SetNonBlocking();
-	bool IsNonBlocking();
-	int GetFd();
+	std::string get_addr() const;
+	RC Create();
+	RC Bind(const char *ip, uint16_t port) const;
+	RC Listen() const;
+	RC Accept(int clnt_fd) const;
+	RC Connect(const char *ip, uint16_t port) const;
+	RC SetNonBlocking() const;
+	bool IsNonBlocking() const;
+	size_t RecvBufSize() const;
+
+private:
+	int fd_;
 };
 

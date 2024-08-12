@@ -1,29 +1,28 @@
-#include "src/Server.h"
 #include <iostream>
-#include "src/Buffer.h"
-#include "src/Connection.h"
-#include "src/EventLoop.h"
-#include "src/Socket.h"
-#include <iostream>
+#include "src/pine.h"
 
 int main()
 {
-	EventLoop *loop = new EventLoop();
-	Server *server = new Server(loop);
+	TcpServer *server = new TcpServer();
 
-	server->NewConnect(
-		[](Connection *conn) {std::cout << "New connection fd: " << conn->GetSocket()->GetFd() << std::endl;});
-	
-	server->OnMessage([](Connection *conn) {
-		std::cout << "Message from client " << conn->ReadBuffer() << std::endl;
-		if(conn->GetState() == Connection::State::Connected){
-			conn->Send(conn->ReadBuffer());
-		}
+	Signal::signal(SIGINT, [&] {
+		delete server;
+		std::cout << "\nServer exit!" << std::endl;
+		exit(0);
 	});
 
-	loop->Loop();
+	server->OnConnect([](Connection *conn) {
+		std::cout << "New connection fd: " << conn->GetSocket()->fd() << std::endl;
+	});
+	
+	server->OnRecv([](Connection *conn) {
+		std::cout << "Message from client " << conn->GetReadBuffer()->c_str() << std::endl;
+		conn->Send(conn->GetReadBuffer()->c_str());
+	});
+
+	server->Start();
+
 	delete server;
-	delete loop;
 	return 0;
 }
 

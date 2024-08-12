@@ -12,11 +12,11 @@ const int Channel::READ_EVENT = 1;
 const int Channel::WRITE_EVENT = 2;
 const int Channel::ET = 4;
 
-Channel::Channel(EventLoop *loop, Socket *socket) : loop_(loop), socket_(socket) {}
+Channel::Channel(int fd, EventLoop *loop) : fd_(fd), loop_(loop), listen_events_(0), ready_events_(0), exist_(false) {}
 
 Channel::~Channel() {loop_->DeleteChannel(this);}
 
-void Channel::HandleEvent()
+void Channel::HandleEvent() const
 {
 	if(ready_events_ & READ_EVENT){
 		read_callback_();
@@ -44,16 +44,16 @@ void Channel::UseET()
 	loop_->UpdateChannel(this);
 }
 
-Socket *Channel::GetSocket() {return socket_;}
+int Channel::fd() const {return fd_;}
 
-int Channel::GetListenEvents() {return listen_events_;}
-int Channel::GetReadyEvents() {return ready_events_;}
+short Channel::GetListenEvents() const {return listen_events_;}
+short Channel::GetReadyEvents() const {return ready_events_;}
 
-bool Channel::GetExist() {return exist_;}
+bool Channel::GetExist() const {return exist_;}
 
 void Channel::SetExist(bool in) {exist_ = in;}
 
-void Channel::SetReadyEvents(int ev) 
+void Channel::SetReadyEvents(short ev) 
 {
 	if(ev & READ_EVENT){
 		ready_events_ |= READ_EVENT;
@@ -66,6 +66,6 @@ void Channel::SetReadyEvents(int ev)
 	}
 }
 
-void Channel::SetReadCallback(std::function<void()> const &callback) {read_callback_ = callback;}
-void Channel::SetWriteCallback(std::function<void()> const &callback) {write_callback_ = callback;}
+void Channel::SetReadCallback(std::function<void()> const &callback) {read_callback_ = std::move(callback);}
+void Channel::SetWriteCallback(std::function<void()> const &callback) {write_callback_ = std::move(callback);}
 

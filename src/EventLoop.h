@@ -1,22 +1,19 @@
 #pragma once
 
-#include <functional>
+#include <memory>
+#include "common.h"
 
-class Epoll;
-class Channel;
 class EventLoop
 {
-private:
-	Epoll *epoll_{nullptr};
-	bool quit_{false};
-
 public:
 	EventLoop();
 	~EventLoop();
 
-	void Loop();
-	void UpdateChannel(Channel *ch);
-	void DeleteChannel(Channel *ch);
-	void Quit();
+	void Loop() const;
+	void UpdateChannel(Channel *ch) const;
+	void DeleteChannel(Channel *ch) const;
+
+private:
+	std::unique_ptr<Epoll> epoll_;
 };
 
