@@ -15,7 +15,7 @@ public:
 	RC Create();
 	RC Bind(const char *ip, uint16_t port) const;
 	RC Listen() const;
-	RC Accept(int clnt_fd) const;
+	RC Accept(int &clnt_fd) const;
 	RC Connect(const char *ip, uint16_t port) const;
 	RC SetNonBlocking() const;
 	bool IsNonBlocking() const;

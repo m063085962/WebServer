@@ -34,7 +34,7 @@ void TcpServer::Start()
 
 RC TcpServer::NewConnection(int fd)
 {
-	assert(fd == -1);
+	assert(fd != -1);
 	uint64_t random = fd % sub_reactors_.size();
 	std::unique_ptr<Connection> conn  = std::make_unique<Connection>(fd, sub_reactors_[random].get());
 	std::function<void(int)> cb =std::bind(&TcpServer::DeleteConnection, this, std::placeholders::_1);

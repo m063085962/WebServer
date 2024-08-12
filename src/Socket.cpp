@@ -91,7 +91,7 @@ RC Socket::Listen() const
 	return RC_SUCCESS;
 }
 
-RC Socket::Accept(int clnt_fd) const 
+RC Socket::Accept(int &clnt_fd) const 
 {
 	// TODO: non-blocking
 	assert(fd_ != -1);
