@@ -1,5 +1,7 @@
 #include <iostream>
-#include "src/pine.h"
+#include "Socket.h"
+#include "Connection.h"
+#include "Buffer.h"
 
 int main()
 {
@@ -19,10 +21,9 @@ int main()
 			break;
 		}
 		conn->Read();
-		std::cout << "Message from server:" << conn->GetReadBuffer()->c_str() << std::endl;
+		std::cout << "Message from server: " << conn->GetReadBuffer()->c_str() << std::endl;
 	}
 
-	delete conn;
 	delete sock;
 	return 0;
 }
