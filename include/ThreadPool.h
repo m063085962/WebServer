@@ -13,21 +13,23 @@
 #include <future>
 #include "common.h"
 
-class ThreadPool
-{
-private:
-	std::vector<std::thread> workers_;
-	std::queue<std::function<void()>> tasks_;
-	std::mutex queue_mutex_;
-	std::condition_variable condition_variable_;
-	std::atomic<bool> stop_{false};
-
+class ThreadPool {
 public:
 	explicit ThreadPool(unsigned int size = std::thread::hardware_concurrency());
 	~ThreadPool();
 
-	template<class F, class... Args>
+	template <class F, class... Args>
 	auto Add(F &&f, Args  &&...args) -> std::future<typename std::invoke_result<F, Args...>::type>;
+
+private:
+	DISALLOW_COPY_AND_MOVE(ThreadPool);
+
+	std::vector<std::thread> workers_;
+	std::queue<std::function<void()>> tasks_;
+
+	std::mutex queue_mutex_;
+	std::condition_variable condition_variable_;
+	std::atomic<bool> stop_{false};
 };
 
 template<class F, class... Args>

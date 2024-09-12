@@ -4,8 +4,7 @@
 #include <memory>
 #include "common.h"
 
-class Connection
-{
+class Connection {
 public:
 	enum State{
 		Invalid = 0,
@@ -13,6 +12,7 @@ public:
 		Connected,
 		Closed,
 	};
+
 	Connection(int fd, EventLoop *loop);
 	~Connection();
 	
@@ -36,13 +36,14 @@ public:
 	void OnMessage(std::function<void()> fn);
 
 private:
+	DISALLOW_COPY_AND_MOVE(Connection);
+
 	void Business();
 	RC ReadNonBlocking();
 	RC WriteNonBlocking();
 	RC ReadBlocking();
 	RC WriteBlocking();
 
-private:
 	std::unique_ptr<Socket> socket_;
 	std::unique_ptr<Channel> channel_;
 

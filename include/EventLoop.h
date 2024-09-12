@@ -3,8 +3,7 @@
 #include <memory>
 #include "common.h"
 
-class EventLoop
-{
+class EventLoop {
 public:
 	EventLoop();
 	~EventLoop();
@@ -14,6 +13,8 @@ public:
 	void DeleteChannel(Channel *ch) const;
 
 private:
+	DISALLOW_COPY_AND_MOVE(EventLoop);
+
 	std::unique_ptr<Epoll> epoll_;
 };
 

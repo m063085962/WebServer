@@ -2,9 +2,7 @@
 
 #include <sys/epoll.h>
 #include <unistd.h>
-
 #include <utility>
-
 #include "EventLoop.h"
 #include "Socket.h"
 
@@ -16,30 +14,26 @@ Channel::Channel(int fd, EventLoop *loop) : fd_(fd), loop_(loop), listen_events_
 
 Channel::~Channel() {loop_->DeleteChannel(this);}
 
-void Channel::HandleEvent() const
-{
-	if(ready_events_ & READ_EVENT){
+void Channel::HandleEvent() const {
+	if(ready_events_ & READ_EVENT) {
 		read_callback_();
 	}
-	if(ready_events_ & WRITE_EVENT){
+	if(ready_events_ & WRITE_EVENT) {
 		write_callback_();
 	}
 }
 
-void Channel::EnableRead()
-{
+void Channel::EnableRead() {
 	listen_events_ |= READ_EVENT;
 	loop_->UpdateChannel(this);
 }
 
-void Channel::EnableWrite()
-{
+void Channel::EnableWrite() {
 	listen_events_ |= WRITE_EVENT;
 	loop_->UpdateChannel(this);
 }
 
-void Channel::UseET()
-{
+void Channel::UseET() {
 	listen_events_ |= ET;
 	loop_->UpdateChannel(this);
 }
@@ -53,15 +47,14 @@ bool Channel::GetExist() const {return exist_;}
 
 void Channel::SetExist(bool in) {exist_ = in;}
 
-void Channel::SetReadyEvents(short ev) 
-{
-	if(ev & READ_EVENT){
+void Channel::SetReadyEvents(short ev) {
+	if(ev & READ_EVENT) {
 		ready_events_ |= READ_EVENT;
 	}
-	if(ev & WRITE_EVENT){
+	if(ev & WRITE_EVENT) {
 		ready_events_ |= WRITE_EVENT;
 	}
-	if(ev & ET){
+	if(ev & ET) {
 		ready_events_ |= ET;
 	}
 }

@@ -3,8 +3,7 @@
 #include <functional>
 #include "common.h"
 
-class Channel
-{
+class Channel {
 public:
 	Channel(int fd, EventLoop *loop);
 	~Channel();
@@ -29,11 +28,15 @@ public:
 	static const int ET;
 
 private:
+	DISALLOW_COPY_AND_MOVE(Channel);
+
 	int fd_;
-	EventLoop *loop_;          
+	EventLoop *loop_;
+
 	short listen_events_;
 	short ready_events_;
 	bool exist_;
+
 	std::function<void()> read_callback_;
 	std::function<void()> write_callback_;
 };

@@ -1,15 +1,19 @@
 #include <iostream>
-#include "pine.h"
+#include "TcpServer.h"
+#include "SignalHandler.h"
+#include "Connection.h"
+#include "Buffer.h"
+#include "Socket.h"
 
 int main()
 {
 	TcpServer *server = new TcpServer();
 
-//	Signal::signal(SIGINT, [&] {
-//		delete server;
-//		std::cout << "\nServer exit!" << std::endl;
-//		exit(0);
-//	});
+	Signal::signal(SIGINT, [&] {
+		delete server;
+		std::cout << "\nServer exit!" << std::endl;
+		exit(0);
+	});
 
 	server->OnConnect([](Connection *conn) {
 		std::cout << "New connection fd: " << conn->GetSocket()->fd() << std::endl;
@@ -22,7 +26,6 @@ int main()
 
 	server->Start();
 
-	delete server;
 	return 0;
 }
 

@@ -1,5 +1,6 @@
 #include "Acceptor.h"
 
+#include <cassert>
 #include <utility>
 #include <fcntl.h>
 
