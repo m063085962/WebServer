@@ -1,10 +1,11 @@
-#include "Channel.h"
+#include "channel.h"
 
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <utility>
-#include "EventLoop.h"
-#include "Socket.h"
+
+#include "eventloop.h"
+#include "socket.h"
 
 const int Channel::READ_EVENT = 1;
 const int Channel::WRITE_EVENT = 2;

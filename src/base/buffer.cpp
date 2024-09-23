@@ -1,4 +1,4 @@
-#include "Buffer.h"
+#include "buffer.h"
 
 const std::string &Buffer::buf() const {return buf_;}
 

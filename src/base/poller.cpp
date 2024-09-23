@@ -1,11 +1,11 @@
-#include "Epoll.h"
+#include "poller.h"
 
 #include <unistd.h>
 #include <cstring>
 #include <cassert>
 
-#include "Channel.h"
-#include "Socket.h"
+#include "channel.h"
+#include "socket.h"
 
 #define MAX_EVENTS 1000
 
@@ -49,7 +49,7 @@ std::vector<Channel*> Epoll::Poll(int timeout)
 
 RC Epoll::UpdateChannel(Channel *ch)
 {
-	int sockfd = ch->fd();
+	int fd = ch->fd();
 	struct epoll_event ev{};
 	ev.data.ptr = ch;
 	if(ch->GetListenEvents() & Channel::READ_EVENT) {
@@ -62,13 +62,13 @@ RC Epoll::UpdateChannel(Channel *ch)
 		ev.events |= EPOLLET;
 	}
 	if(!ch->GetExist()) {
-		if(epoll_ctl(epfd_, EPOLL_CTL_ADD, sockfd, &ev) == -1){
+		if(epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &ev) == -1){
 			perror("epoll add error");
 			return RC_EPOLL_ERROR;
 		}
 		ch->SetExist();
 	} else {
-		if(epoll_ctl(epfd_, EPOLL_CTL_MOD, sockfd, &ev) == -1){
+		if(epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &ev) == -1){
 			perror("epoll mod error");
 			return RC_EPOLL_ERROR;
 		}

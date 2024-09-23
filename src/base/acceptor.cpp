@@ -1,11 +1,11 @@
-#include "Acceptor.h"
+#include "acceptor.h"
 
 #include <cassert>
 #include <utility>
 #include <fcntl.h>
 
-#include "Socket.h"
-#include "Channel.h"
+#include "socket.h"
+#include "channel.h"
 
 Acceptor::Acceptor(EventLoop *loop)
 {

@@ -1,9 +1,9 @@
 #include <iostream>
-#include "TcpServer.h"
+#include "tcpserver.h"
 #include "SignalHandler.h"
-#include "Connection.h"
-#include "Buffer.h"
-#include "Socket.h"
+#include "connection.h"
+#include "buffer.h"
+#include "socket.h"
 
 int main()
 {

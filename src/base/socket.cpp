@@ -1,13 +1,13 @@
-#include "Socket.h"
+#include "socket.h"
+
+#include <arpa/inet.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 
 #include <fcntl.h>
 #include <unistd.h>
 #include <cassert>
 #include <cstring>
-
-#include <arpa/inet.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
 
 Socket::Socket() : fd_(-1) {}
 

@@ -1,12 +1,12 @@
-#include "Connection.h"
+#include "connection.h"
 
 #include <unistd.h>
 #include <cassert>
 #include <cstring>
 
-#include "Buffer.h"
-#include "Channel.h"
-#include "Socket.h"
+#include "buffer.h"
+#include "channel.h"
+#include "socket.h"
 
 Connection::Connection(int fd, EventLoop *loop) {
 	socket_ = std::make_unique<Socket>();
