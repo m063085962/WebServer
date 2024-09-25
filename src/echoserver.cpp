@@ -1,6 +1,5 @@
 #include <iostream>
 #include "tcpserver.h"
-#include "SignalHandler.h"
 #include "connection.h"
 #include "buffer.h"
 #include "socket.h"
@@ -8,12 +7,6 @@
 int main()
 {
 	TcpServer *server = new TcpServer();
-
-	Signal::signal(SIGINT, [&] {
-		delete server;
-		std::cout << "\nServer exit!" << std::endl;
-		exit(0);
-	});
 
 	server->OnConnect([](Connection *conn) {
 		std::cout << "New connection fd: " << conn->GetSocket()->fd() << std::endl;
@@ -25,6 +18,7 @@ int main()
 	});
 
 	server->Start();
+	delete server;
 
 	return 0;
 }
